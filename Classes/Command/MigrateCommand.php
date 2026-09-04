@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Andersundsehr\ShyConverter\Command;
 
+use Andersundsehr\ShyConverter\Utility\SoftHyphenConverter;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Override;
@@ -20,16 +21,10 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 #[AsCommand(
     name: 'shy-converter:migrate',
     description: 'Convert HTML soft hyphen entities in input fields to UTF-8 soft hyphens',
-    aliases: ['SC'],
+    aliases: ['sc:m'],
 )]
 final class MigrateCommand extends Command
 {
-    private const HTML_SOFT_HYPHEN = '&shy;';
-
-    private const MALFORMED_HTML_SOFT_HYPHEN = '&shy';
-
-    private const UTF8_SOFT_HYPHEN = "\u{00AD}";
-
     /** @var list<string> */
     private const TEXT_COLUMN_TYPES = [
         Types::ASCII_STRING,
@@ -205,9 +200,9 @@ final class MigrateCommand extends Command
                         $quotedFieldName,
                     ),
                     [
-                        'htmlSource' => self::HTML_SOFT_HYPHEN,
-                        'malformedHtmlSource' => self::MALFORMED_HTML_SOFT_HYPHEN,
-                        'replacement' => self::UTF8_SOFT_HYPHEN,
+                        'htmlSource' => SoftHyphenConverter::HTML_SOFT_HYPHEN,
+                        'malformedHtmlSource' => SoftHyphenConverter::MALFORMED_HTML_SOFT_HYPHEN,
+                        'replacement' => SoftHyphenConverter::UTF8_SOFT_HYPHEN,
                     ],
                     [
                         'htmlSource' => Connection::PARAM_STR,
@@ -244,7 +239,7 @@ final class MigrateCommand extends Command
                     $quotedFieldName,
                     $quotedFieldName,
                 ),
-                ['malformedHtmlSource' => self::MALFORMED_HTML_SOFT_HYPHEN],
+                ['malformedHtmlSource' => SoftHyphenConverter::MALFORMED_HTML_SOFT_HYPHEN],
                 ['malformedHtmlSource' => Connection::PARAM_STR],
             );
         }
