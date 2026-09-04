@@ -26,6 +26,8 @@ final class MigrateCommand extends Command
 {
     private const HTML_SOFT_HYPHEN = '&shy;';
 
+    private const MALFORMED_HTML_SOFT_HYPHEN = '&shy';
+
     private const UTF8_SOFT_HYPHEN = "\u{00AD}";
 
     /** @var list<string> */
@@ -192,8 +194,10 @@ final class MigrateCommand extends Command
                 $quotedFieldName = $connection->quoteIdentifier($fieldName);
                 $result[$fieldName] = (int)$connection->executeStatement(
                     sprintf(
-                        'UPDATE %s SET %s = REPLACE(%s, :source, :replacement) '
-                        . 'WHERE LENGTH(REPLACE(%s, :source, \'\')) < LENGTH(%s)',
+                        'UPDATE %s SET %s = REPLACE('
+                        . 'REPLACE(%s, :htmlSource, :replacement), '
+                        . ':malformedHtmlSource, :replacement'
+                        . ') WHERE LENGTH(REPLACE(%s, :malformedHtmlSource, \'\')) < LENGTH(%s)',
                         $quotedTableName,
                         $quotedFieldName,
                         $quotedFieldName,
@@ -201,11 +205,13 @@ final class MigrateCommand extends Command
                         $quotedFieldName,
                     ),
                     [
-                        'source' => self::HTML_SOFT_HYPHEN,
+                        'htmlSource' => self::HTML_SOFT_HYPHEN,
+                        'malformedHtmlSource' => self::MALFORMED_HTML_SOFT_HYPHEN,
                         'replacement' => self::UTF8_SOFT_HYPHEN,
                     ],
                     [
-                        'source' => Connection::PARAM_STR,
+                        'htmlSource' => Connection::PARAM_STR,
+                        'malformedHtmlSource' => Connection::PARAM_STR,
                         'replacement' => Connection::PARAM_STR,
                     ],
                 );
@@ -233,13 +239,13 @@ final class MigrateCommand extends Command
             $result[$fieldName] = (int)$connection->fetchOne(
                 sprintf(
                     'SELECT COUNT(*) FROM %s '
-                    . 'WHERE LENGTH(REPLACE(%s, :source, \'\')) < LENGTH(%s)',
+                    . 'WHERE LENGTH(REPLACE(%s, :malformedHtmlSource, \'\')) < LENGTH(%s)',
                     $quotedTableName,
                     $quotedFieldName,
                     $quotedFieldName,
                 ),
-                ['source' => self::HTML_SOFT_HYPHEN],
-                ['source' => Connection::PARAM_STR],
+                ['malformedHtmlSource' => self::MALFORMED_HTML_SOFT_HYPHEN],
+                ['malformedHtmlSource' => Connection::PARAM_STR],
             );
         }
 
