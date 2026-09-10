@@ -6,9 +6,17 @@ namespace Andersundsehr\ShyConverter\Form\Element;
 
 use Andersundsehr\ShyConverter\Utility\SoftHyphenConverter;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Backend\Form\Element\InputTextElement;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 
+/**
+ * Renders backend input fields with visible soft-hyphen notation.
+ *
+ * It displays persisted UTF-8 soft hyphens as HTML entities and delegates
+ * synchronization of the editor value to the JavaScript module.
+ */
+#[Autoconfigure(public: true)]
 final class VisibleShyElement extends InputTextElement
 {
     private const JAVASCRIPT_MODULE = '@andersundsehr/shy-converter/visible-shy.js';

@@ -6,9 +6,3 @@ services:
   Andersundsehr\ShyConverter\:
     resource: '../Classes/*'
     exclude: '../Classes/Domain/Model/*'
-
-  Andersundsehr\ShyConverter\Form\Element\VisibleShyElement:
-    public: true
-
-  Andersundsehr\ShyConverter\Form\FormDataProvider\VisibleShyFormDataProvider:
-    public: true

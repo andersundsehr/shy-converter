@@ -4,8 +4,16 @@ declare(strict_types=1);
 
 namespace Andersundsehr\ShyConverter\Form\FormDataProvider;
 
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Backend\Form\FormDataProviderInterface;
 
+/**
+ * Applies the visible soft-hyphen render type to eligible TCA input fields.
+ *
+ * Input fields without an explicitly configured render type use the custom
+ * FormEngine element so editors can see and edit soft hyphens.
+ */
+#[Autoconfigure(public: true)]
 final class VisibleShyFormDataProvider implements FormDataProviderInterface
 {
     public const RENDER_TYPE = 'visibleShy';

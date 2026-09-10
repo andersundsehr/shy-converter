@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Andersundsehr\ShyConverter\Utility;
 
+/**
+ * Converts soft hyphens between their persisted and editor-facing representations.
+ *
+ * The database value is the UTF-8 soft-hyphen character, while editors work
+ * with the visible HTML entity notation.
+ */
 final class SoftHyphenConverter
 {
     public const HTML_SOFT_HYPHEN = '&shy;';
