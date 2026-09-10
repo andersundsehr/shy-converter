@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Andersundsehr\ShyConverter\Form\Element\VisibleShyElement;
 use Andersundsehr\ShyConverter\Form\FormDataProvider\VisibleShyFormDataProvider;
-use Andersundsehr\ShyConverter\Hooks\DataHandlerHook;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessCommon;
 
@@ -26,7 +25,3 @@ $formEngineConfiguration['formDataGroup']['tcaDatabaseRecord'][VisibleShyFormDat
     ],
 ];
 unset($formEngineConfiguration);
-
-$dataHandlerHooks = &$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'];
-$dataHandlerHooks['shy-converter'] = DataHandlerHook::class;
-unset($dataHandlerHooks);

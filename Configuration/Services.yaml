@@ -12,6 +12,3 @@ services:
 
   Andersundsehr\ShyConverter\Form\FormDataProvider\VisibleShyFormDataProvider:
     public: true
-
-  Andersundsehr\ShyConverter\Hooks\DataHandlerHook:
-    public: true
