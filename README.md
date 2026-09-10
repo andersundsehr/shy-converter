@@ -1,6 +1,21 @@
 # shy-converter
 
-This extension converts valid and malformed HTML soft hyphens (`&amp;shy;` and `&amp;shy`) to their UTF-8 equivalent and includes a database migration to update existing data.
+This extension converts valid and malformed HTML soft hyphens (`&shy;` and `&shy`) to their UTF-8 equivalent and includes a database migration to update existing data.
+
+## Installation
+
+Install the extension in a TYPO3 13.4 or 14 project:
+
+```bash
+composer require andersundsehr/shy-converter
+```
+
+Optionally migrate existing values after reviewing the affected records:
+
+```bash
+vendor/bin/typo3 shy-converter:migrate --dry-run
+vendor/bin/typo3 shy-converter:migrate
+```
 
 ## Visible soft hyphens in backend input fields
 
