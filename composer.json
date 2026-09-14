@@ -1,12 +1,13 @@
 {
     "name": "andersundsehr/shy-converter",
-    "description": "This extension converts valid and malformed HTML soft hyphens (&shy; and &shy) to their UTF-8 equivalent and includes a database migration to update existing data.",
+    "description": "Converts HTML soft hyphens and non-breaking spaces to their UTF-8 equivalents and includes a database migration for existing data.",
     "type": "typo3-cms-extension",
     "license": [
         "GPL-2.0-or-later"
     ],
     "version": "1.0.0",
     "require": {
+        "typo3/cms-backend": "^13.4 || ^14.0",
         "typo3/cms-core": "^13.4 || ^14.0"
     },
     "autoload": {

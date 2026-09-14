@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Andersundsehr\ShyConverter\Command;
 
+use Andersundsehr\ShyConverter\Utility\SoftHyphenConverter;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Override;
@@ -19,17 +20,11 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 
 #[AsCommand(
     name: 'shy-converter:migrate',
-    description: 'Convert HTML soft hyphen entities in input fields to UTF-8 soft hyphens',
-    aliases: ['SC'],
+    description: 'Convert supported HTML entities in input fields to their UTF-8 characters',
+    aliases: ['sc:m'],
 )]
 final class MigrateCommand extends Command
 {
-    private const HTML_SOFT_HYPHEN = '&shy;';
-
-    private const MALFORMED_HTML_SOFT_HYPHEN = '&shy';
-
-    private const UTF8_SOFT_HYPHEN = "\u{00AD}";
-
     /** @var list<string> */
     private const TEXT_COLUMN_TYPES = [
         Types::ASCII_STRING,
@@ -59,7 +54,7 @@ final class MigrateCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $dryRun = (bool)$input->getOption('dry-run');
 
-        $io->title('Soft hyphen database migration');
+        $io->title('Special character database migration');
 
         try {
             $fieldsByTable = $this->findEligibleFields($io);
@@ -195,24 +190,32 @@ final class MigrateCommand extends Command
                 $result[$fieldName] = (int)$connection->executeStatement(
                     sprintf(
                         'UPDATE %s SET %s = REPLACE('
-                        . 'REPLACE(%s, :htmlSource, :replacement), '
-                        . ':malformedHtmlSource, :replacement'
-                        . ') WHERE LENGTH(REPLACE(%s, :malformedHtmlSource, \'\')) < LENGTH(%s)',
+                        . 'REPLACE(REPLACE(%s, :htmlShySource, :shyReplacement), '
+                        . ':malformedHtmlShySource, :shyReplacement), '
+                        . ':htmlNbspSource, :nbspReplacement'
+                        . ') WHERE LENGTH(REPLACE(%s, :malformedHtmlShySource, \'\')) < LENGTH(%s) '
+                        . 'OR LENGTH(REPLACE(%s, :htmlNbspSource, \'\')) < LENGTH(%s)',
                         $quotedTableName,
+                        $quotedFieldName,
+                        $quotedFieldName,
                         $quotedFieldName,
                         $quotedFieldName,
                         $quotedFieldName,
                         $quotedFieldName,
                     ),
                     [
-                        'htmlSource' => self::HTML_SOFT_HYPHEN,
-                        'malformedHtmlSource' => self::MALFORMED_HTML_SOFT_HYPHEN,
-                        'replacement' => self::UTF8_SOFT_HYPHEN,
+                        'htmlShySource' => SoftHyphenConverter::HTML_SOFT_HYPHEN,
+                        'malformedHtmlShySource' => SoftHyphenConverter::MALFORMED_HTML_SOFT_HYPHEN,
+                        'shyReplacement' => SoftHyphenConverter::UTF8_SOFT_HYPHEN,
+                        'htmlNbspSource' => SoftHyphenConverter::HTML_NON_BREAKING_SPACE,
+                        'nbspReplacement' => SoftHyphenConverter::UTF8_NON_BREAKING_SPACE,
                     ],
                     [
-                        'htmlSource' => Connection::PARAM_STR,
-                        'malformedHtmlSource' => Connection::PARAM_STR,
-                        'replacement' => Connection::PARAM_STR,
+                        'htmlShySource' => Connection::PARAM_STR,
+                        'malformedHtmlShySource' => Connection::PARAM_STR,
+                        'shyReplacement' => Connection::PARAM_STR,
+                        'htmlNbspSource' => Connection::PARAM_STR,
+                        'nbspReplacement' => Connection::PARAM_STR,
                     ],
                 );
             }
@@ -239,13 +242,22 @@ final class MigrateCommand extends Command
             $result[$fieldName] = (int)$connection->fetchOne(
                 sprintf(
                     'SELECT COUNT(*) FROM %s '
-                    . 'WHERE LENGTH(REPLACE(%s, :malformedHtmlSource, \'\')) < LENGTH(%s)',
+                    . 'WHERE LENGTH(REPLACE(%s, :malformedHtmlShySource, \'\')) < LENGTH(%s) '
+                    . 'OR LENGTH(REPLACE(%s, :htmlNbspSource, \'\')) < LENGTH(%s)',
                     $quotedTableName,
                     $quotedFieldName,
                     $quotedFieldName,
+                    $quotedFieldName,
+                    $quotedFieldName,
                 ),
-                ['malformedHtmlSource' => self::MALFORMED_HTML_SOFT_HYPHEN],
-                ['malformedHtmlSource' => Connection::PARAM_STR],
+                [
+                    'malformedHtmlShySource' => SoftHyphenConverter::MALFORMED_HTML_SOFT_HYPHEN,
+                    'htmlNbspSource' => SoftHyphenConverter::HTML_NON_BREAKING_SPACE,
+                ],
+                [
+                    'malformedHtmlShySource' => Connection::PARAM_STR,
+                    'htmlNbspSource' => Connection::PARAM_STR,
+                ],
             );
         }
 
