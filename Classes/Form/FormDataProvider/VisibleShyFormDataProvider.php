@@ -8,10 +8,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Backend\Form\FormDataProviderInterface;
 
 /**
- * Applies the visible soft-hyphen render type to eligible TCA input fields.
+ * Applies the visible special-character render type to eligible TCA input fields.
  *
  * Input fields without an explicitly configured render type use the custom
- * FormEngine element so editors can see and edit soft hyphens.
+ * FormEngine element so editors can see and edit otherwise invisible characters.
  */
 #[Autoconfigure(public: true)]
 final class VisibleShyFormDataProvider implements FormDataProviderInterface

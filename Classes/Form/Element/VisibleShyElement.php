@@ -11,10 +11,10 @@ use TYPO3\CMS\Backend\Form\Element\InputTextElement;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 
 /**
- * Renders backend input fields with visible soft-hyphen notation.
+ * Renders backend input fields with visible notation for otherwise invisible characters.
  *
- * It displays persisted UTF-8 soft hyphens as HTML entities and delegates
- * synchronization of the editor value to the JavaScript module.
+ * It displays supported persisted UTF-8 characters as HTML entities and
+ * delegates synchronization of the editor value to the JavaScript module.
  */
 #[Autoconfigure(public: true)]
 final class VisibleShyElement extends InputTextElement
@@ -30,9 +30,9 @@ final class VisibleShyElement extends InputTextElement
         $itemValue = $this->data['parameterArray']['itemFormElValue'] ?? null;
         $config = &$this->data['parameterArray']['fieldConf']['config'];
 
-        // The visible notation consists of five characters while the persisted
-        // soft hyphen is a single character. Server-side TCA processing still
-        // applies the original min/max configuration to the submitted value.
+        // The visible entity notation is longer than the persisted character.
+        // Server-side TCA processing still applies the original min/max
+        // configuration to the submitted value.
         unset($config['min'], $config['max']);
 
         if ($config['readOnly'] ?? false) {

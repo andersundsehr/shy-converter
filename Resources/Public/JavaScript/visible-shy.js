@@ -1,18 +1,25 @@
 const HTML_SOFT_HYPHEN = "&shy;";
 const MALFORMED_HTML_SOFT_HYPHEN = "&shy";
 const UTF8_SOFT_HYPHEN = "\u00ad";
+const HTML_NON_BREAKING_SPACE = "&nbsp;";
+const UTF8_NON_BREAKING_SPACE = "\u00a0";
 const INITIALIZED_ATTRIBUTE = "visibleShyInitialized";
 const synchronizersByForm = new WeakMap();
 
 const replaceAll = (value, search, replacement) => value.split(search).join(replacement);
 
-export const makeVisible = (value) => replaceAll(value, UTF8_SOFT_HYPHEN, HTML_SOFT_HYPHEN);
+export const makeVisible = (value) => value
+  .replace(/&(?=#\d+;|#x[0-9a-fA-F]+;|[a-zA-Z][a-zA-Z0-9]+;)/g, "&amp;")
+  .replace(/\u00ad/g, HTML_SOFT_HYPHEN)
+  .replace(/\u00a0/g, HTML_NON_BREAKING_SPACE);
 
 export const convertToUtf8 = (value) => replaceAll(
-  replaceAll(value, HTML_SOFT_HYPHEN, UTF8_SOFT_HYPHEN),
+  value
+    .replace(/&shy;/gi, UTF8_SOFT_HYPHEN)
+    .replace(/&nbsp;/gi, UTF8_NON_BREAKING_SPACE),
   MALFORMED_HTML_SOFT_HYPHEN,
   UTF8_SOFT_HYPHEN,
-);
+).replace(/&amp;/gi, "&");
 
 const registerSubmitSynchronizer = (form, synchronizer) => {
   let synchronizers = synchronizersByForm.get(form);
