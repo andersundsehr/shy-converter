@@ -18,9 +18,7 @@ jobs:
           php-version: ${{ matrix.php }}
       - run: composer config allow-plugins.typo3/class-alias-loader true
       - run: composer config allow-plugins.typo3/cms-composer-installers true
-      - run: composer require "typo3/cms-core:^${{ matrix.typo3 }}" --no-update --no-interaction
-      - run: TYPO3_SKIP_ASSET_PUBLISH=true composer require "enshrined/svg-sanitize:~1.0.0" --dev --sort-packages --no-interaction -W
+      - run: composer require "typo3/cms-core:^${{ matrix.typo3 }}" --no-interaction
       - run: composer validate --no-check-publish
       - run: composer check-platform-reqs
-      - run: composer audit --abandoned=report
       - run: find . -name '*.php' -not -path './vendor/*' -not -path './.git/*' -print0 | xargs -0 -n 1 php -l
